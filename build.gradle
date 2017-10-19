@@ -2,11 +2,15 @@
 
 buildscript {
     repositories {
+        mavenCentral()
         jcenter()
+        maven { url "https://jitpack.io" }
+        maven { url "https://maven.google.com" }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.3.3'
-        classpath "io.realm:realm-gradle-plugin:3.2.1"
+        classpath 'com.android.tools.build:gradle:3.0.0-beta6'
+//        classpath "io.realm:realm-gradle-plugin:3.2.1"
+        classpath "io.realm:realm-gradle-plugin:3.7.0"
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.6'
         classpath 'com.github.dcendents:android-maven-gradle-plugin:1.4.1'
         classpath 'com.novoda:bintray-release:0.4.0'
@@ -20,6 +24,7 @@ allprojects {
         mavenCentral()
         jcenter()
         maven { url "https://jitpack.io" }
+        maven { url "https://maven.google.com" }
     }
 }
 
