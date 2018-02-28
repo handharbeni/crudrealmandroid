@@ -1,12 +1,10 @@
 package illiyin.mhandharbeni.crudrealmandroid;
 
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.widget.TextView;
 
 import illiyin.mhandharbeni.crudrealmmodul.CRUDRealm;
-import io.realm.Case;
-import io.realm.RealmObject;
 import io.realm.RealmResults;
 
 public class MainActivity extends AppCompatActivity {

@@ -35,46 +35,71 @@ public class CRUDRealm {
     }
 
     public void create(RealmObject objectModel) {
-        realm.beginTransaction();
-        realm.copyToRealm(objectModel);
-        realm.commitTransaction();
+        if (!checkRealmTransaction()){
+            realm.beginTransaction();
+            realm.copyToRealm(objectModel);
+            realm.commitTransaction();
+        }
     }
 
     public RealmResults<?> read() {
-        RealmResults<?> realmResult  = realm.where(modelObject.getClass()).findAll();
+        RealmResults<?> realmResult = null;
+        if (!checkRealmTransaction()){
+            realmResult  = realm.where(modelObject.getClass()).findAll();
+        }
         return realmResult;
     }
     public RealmResults<?> read(String filter, String change) {
-        RealmResults<?> realmResult  = realm.where(modelObject.getClass()).equalTo(filter, change).findAll();
+        RealmResults<?> realmResult = null;
+        if (!checkRealmTransaction()){
+            realmResult  = realm.where(modelObject.getClass()).equalTo(filter, change).findAll();
+        }
         return realmResult;
     }
     public RealmResults<?> read(String filter, String[] change) {
-        RealmQuery<?> realmResult  = realm.where(modelObject.getClass());
-        int i = 0;
-        for(String changes : change) {
-            if(i != 0) {
-                realmResult = realmResult.or();
+        RealmQuery<?> realmResult = null;
+        if (!checkRealmTransaction()){
+            realmResult  = realm.where(modelObject.getClass());
+        }
+        if (realmResult != null){
+            int i = 0;
+            for(String changes : change) {
+                if(i != 0) {
+                    realmResult = realmResult.or();
+                }
+                realmResult = realmResult.equalTo(filter, changes);
+                i++;
             }
-            realmResult = realmResult.equalTo(filter, changes);
-            i++;
         }
         return realmResult.findAll();
     }
     public RealmResults<?> read(String filter, Integer change) {
-        RealmResults<?> realmResult  = realm.where(modelObject.getClass()).equalTo(filter, change).findAll();
+        RealmResults<?> realmResult = null;
+        if (!checkRealmTransaction()){
+            realmResult  = realm.where(modelObject.getClass()).equalTo(filter, change).findAll();
+        }
         return realmResult;
     }
     public RealmResults<?> like(String key, String filter, Case casing){
-        RealmResults<?> realmResult  = realm.where(modelObject.getClass()).like(key, filter, casing).findAll();
+        RealmResults<?> realmResult = null;
+        if (!checkRealmTransaction()){
+            realmResult  = realm.where(modelObject.getClass()).like(key, filter, casing).findAll();
+        }
         return realmResult;
     }
     public RealmResults<?> contains(String key, String filter, String sort){
-        RealmResults<?> realmResults = realm.where(modelObject.getClass()).contains(key, filter).findAllSorted(sort);
-        return realmResults;
+        RealmResults<?> realmResult = null;
+        if (!checkRealmTransaction()){
+            realmResult = realm.where(modelObject.getClass()).contains(key, filter).findAllSorted(sort);
+        }
+        return realmResult;
     }
     public RealmResults<?> contains(String key, String filter){
-        RealmResults<?> realmResults = realm.where(modelObject.getClass()).contains(key, filter, Case.INSENSITIVE).findAll();
-        return realmResults;
+        RealmResults<?> realmResult = null;
+        if (!checkRealmTransaction()){
+            realmResult = realm.where(modelObject.getClass()).contains(key, filter, Case.INSENSITIVE).findAll();
+        }
+        return realmResult;
     }
     public RealmResults<?> read(String filter, Integer[] change) {
         RealmQuery<?> realmResult  = realm.where(modelObject.getClass());
@@ -90,12 +115,18 @@ public class CRUDRealm {
         return realmResult.findAll();
     }
     public RealmObject setObjectUpdate(String filter, String value){
-        RealmObject realmObject = realm.where(modelObject.getClass()).equalTo(filter, value).findFirst();
-        return realmObject;
+        RealmObject realmResult = null;
+        if (!checkRealmTransaction()){
+            realmResult = realm.where(modelObject.getClass()).equalTo(filter, value).findFirst();
+        }
+        return realmResult;
     }
     public RealmObject setObjectUpdate(String filter, Integer value){
-        RealmObject realmObject = realm.where(modelObject.getClass()).equalTo(filter, value).findFirst();
-        return realmObject;
+        RealmObject realmResult = null;
+        if (!checkRealmTransaction()){
+            realmResult = realm.where(modelObject.getClass()).equalTo(filter, value).findFirst();
+        }
+        return realmResult;
     }
     public void openObject(){
         realm.beginTransaction();
@@ -108,21 +139,27 @@ public class CRUDRealm {
         return true;
     }
     public boolean delete(String filter, String value) {
-        realm.beginTransaction();
-        RealmResults realmResults = realm.where(modelObject.getClass())
-                .equalTo(filter, value)
-                .findAll();
-        boolean deleted = realmResults.deleteFirstFromRealm();
-        realm.commitTransaction();
+        boolean deleted = false;
+        if (!checkRealmTransaction()){
+            realm.beginTransaction();
+            RealmResults realmResults = realm.where(modelObject.getClass())
+                    .equalTo(filter, value)
+                    .findAll();
+            deleted = realmResults.deleteFirstFromRealm();
+            realm.commitTransaction();
+        }
         return deleted;
     }
     public boolean delete(String filter, Integer value) {
-        realm.beginTransaction();
-        RealmResults realmResults = realm.where(modelObject.getClass())
-                .equalTo(filter, value)
-                .findAll();
-        boolean deleted = realmResults.deleteFirstFromRealm();
-        realm.commitTransaction();
+        boolean deleted = false;
+        if (!checkRealmTransaction()){
+            realm.beginTransaction();
+            RealmResults realmResults = realm.where(modelObject.getClass())
+                    .equalTo(filter, value)
+                    .findAll();
+            deleted = realmResults.deleteFirstFromRealm();
+            realm.commitTransaction();
+        }
         return deleted;
     }
     public boolean checkDuplicate(String filter, String value) {
@@ -135,7 +172,9 @@ public class CRUDRealm {
             return false;
         }
     }
-
+    private Boolean checkRealmTransaction(){
+        return realm.isInTransaction();
+    }
     public void closeRealm() {
         if (!realm.isClosed())
             realm.close();
